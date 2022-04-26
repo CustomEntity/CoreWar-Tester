@@ -192,3 +192,4 @@ puts '-------------------------------'
 print "➥ Total Result: #{progressbar(20, percentage, '|')} ".bold
 print "#{percentage}% Success: #{success} Total: #{total}".bold
 puts
+
