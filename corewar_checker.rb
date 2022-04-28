@@ -125,6 +125,8 @@ def handle_file_compilation(binarypath, filepath, i)
 
   Process.wait(executed)
 
+  exit_code = $CHILD_STATUS.exitstatus
+
   Open3.capture3("mv #{filename_ws}.cor #{filename_ws}.tmp.cor")
   executed = fork { Kernel.exec("#{Constants::BINARY_REF_FILE} #{filepath}", in: File::NULL, out: File::NULL, err: File::NULL) }
   return if executed.nil?
@@ -139,8 +141,16 @@ def handle_file_compilation(binarypath, filepath, i)
     puts 'SUCCESS ✔'.green.bold
     1
   else
-    puts 'FAILURE ✖'.red.bold
+    print 'FAILURE ✖'.red.bold
+    if exit_code == nil
+      print "  ➥ Segfault".bold
+    elsif exit_code == 84
+      print "  ➥ Exit code: 84".bold
+    elsif exit_code != 0
+      print "  ➥ Exit code: #{exit_code}".bold
+    end
   end
+  puts
 end
 
 def check_compilation(binarypath)
