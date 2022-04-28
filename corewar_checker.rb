@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'English'
 require 'open3'
 
@@ -58,7 +59,7 @@ class String
   end
 end
 
-if ARGV.size.zero?
+if ARGV.size.zero? || !File.file?(ARGV[0])
   puts 'Please specify a binary file !'.red.bold
   return
 end
@@ -119,13 +120,13 @@ end
 def handle_file_compilation(binarypath, filepath, i)
   filename = filepath.split('/')[filepath.count '/']
   filename_ws = filename.delete_suffix('.s')
-  executed = fork { Kernel.exec("#{binarypath} #{filepath}", out: File::NULL, err: File::NULL) }
+  executed = fork { Kernel.exec("#{binarypath} #{filepath}", in: File::NULL, out: File::NULL, err: File::NULL) }
   return if executed.nil?
 
   Process.wait(executed)
 
   Open3.capture3("mv #{filename_ws}.cor #{filename_ws}.tmp.cor")
-  executed = fork { Kernel.exec("#{Constants::BINARY_REF_FILE} #{filepath}", out: File::NULL, err: File::NULL) }
+  executed = fork { Kernel.exec("#{Constants::BINARY_REF_FILE} #{filepath}", in: File::NULL, out: File::NULL, err: File::NULL) }
   return if executed.nil?
 
   Process.wait(executed)
